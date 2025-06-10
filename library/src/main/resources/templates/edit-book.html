@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Book</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}" />
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            font-size: 1.4rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+        }
+
+        .btn-custom {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header text-center">
+            Edit Book Details
+        </div>
+        <div class="card-body">
+            <form th:action="@{/books/update}" method="post">
+                <input type="hidden" name="bookid" th:value="${book.bookid}" />
+                
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" th:value="${book.title}" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <select name="author_id" id="author" class="form-control" required>
+                        <option th:each="author : ${authors}"
+                                th:value="${author.authorid}"
+                                th:text="${author.name}"
+                                th:selected="${author.authorid == book.author.authorid}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="publisher">Publisher</label>
+                    <select name="publisher_id" id="publisher" class="form-control" required>
+                        <option th:each="publisher : ${publishers}"
+                                th:value="${publisher.publisherid}"
+                                th:text="${publisher.name}"
+                                th:selected="${publisher.publisherid == book.publisher.publisherid}">
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-custom btn-block">Update Book</button>
+            </form>
+            <a href="/books" class="back-link">← Back to Book List</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script th:src="@{/webjars/bootstrap/4.6.0/js/bootstrap.min.js}"></script>
+</body>
+</html>

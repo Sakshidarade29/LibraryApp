@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Borrow Management</title>
+    <meta charset="UTF-8" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}" />
+    <style>
+        body {
+            background-color: #fffacd; /* Light yellow */
+            padding: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6f00;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+        }
+
+        .btn-primary, .btn-warning {
+            font-weight: 600;
+        }
+
+        table {
+            margin-top: 40px;
+        }
+
+        th {
+            background-color: #ffe082;
+        }
+
+        td, th {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        .action-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Borrow Management</h1>
+
+    <form id="borrowForm" class="mb-4">
+        <input type="hidden" id="borrowId" />
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="book_id">Book ID</label>
+                <input type="number" class="form-control" id="book_id" required />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="user_id">User ID</label>
+                <input type="number" class="form-control" id="user_id" required />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="borrowDate">Borrow Date</label>
+                <input type="date" class="form-control" id="borrowDate" required />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="returnDate">Return Date</label>
+                <input type="date" class="form-control" id="returnDate" required />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Add Borrow</button>
+        <button type="button" class="btn btn-warning" id="updateBtn">Update Borrow</button>
+    </form>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Book Title</th>
+                <th>User Name</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="borrowTableBody">
+            <!-- Borrow records will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/webjars/bootstrap/4.6.0/js/bootstrap.min.js}"></script>
+
+<script>
+    async function fetchBorrows() {
+        const response = await fetch('/api/v1/borrow/getAllBorrow');
+        const borrows = await response.json();
+        const tbody = document.getElementById('borrowTableBody');
+        tbody.innerHTML = '';
+
+        borrows.forEach(borrow => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${borrow.id}</td>
+                <td>${borrow.book.title}</td>
+                <td>${borrow.user.name}</td>
+                <td>${borrow.borrowDate}</td>
+                <td>${borrow.returnDate}</td>
+                <td class="action-buttons">
+                    <button class="btn btn-sm btn-info" onclick="editBorrow(${borrow.id})">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteBorrow(${borrow.id})">Delete</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    async function addBorrow(event) {
+        event.preventDefault();
+        const book_id = document.getElementById('book_id').value;
+        const user_id = document.getElementById('user_id').value;
+        const borrowDate = document.getElementById('borrowDate').value;
+        const returnDate = document.getElementById('returnDate').value;
+
+        const payload = {
+            book_id: parseInt(book_id),
+            user_id: parseInt(user_id),
+            borrowDate,
+            returnDate
+        };
+
+        const response = await fetch('/api/v1/borrow/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert('Borrow saved successfully!');
+            fetchBorrows();
+            document.getElementById('borrowForm').reset();
+        } else {
+            alert('Failed to save borrow.');
+        }
+    }
+
+    async function deleteBorrow(id) {
+        if (!confirm('Are you sure you want to delete this borrow?')) return;
+
+        const response = await fetch(`/api/v1/borrow/delete/${id}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Deleted successfully');
+            fetchBorrows();
+        } else {
+            alert('Delete failed');
+        }
+    }
+
+    async function editBorrow(id) {
+        const response = await fetch('/api/v1/borrow/getAllBorrow');
+        const borrows = await response.json();
+        const borrow = borrows.find(b => b.id === id);
+
+        if (borrow) {
+            document.getElementById('borrowId').value = borrow.id;
+            document.getElementById('book_id').value = borrow.book.id;
+            document.getElementById('user_id').value = borrow.user.id;
+            document.getElementById('borrowDate').value = borrow.borrowDate;
+            document.getElementById('returnDate').value = borrow.returnDate;
+
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('updateBtn').style.display = 'inline-block';
+        }
+    }
+
+    async function updateBorrow(event) {
+        event.preventDefault();
+
+        const id = document.getElementById('borrowId').value;
+        const book_id = document.getElementById('book_id').value;
+        const user_id = document.getElementById('user_id').value;
+        const borrowDate = document.getElementById('borrowDate').value;
+        const returnDate = document.getElementById('returnDate').value;
+
+        const payload = {
+            id: parseInt(id),
+            book_id: parseInt(book_id),
+            user_id: parseInt(user_id),
+            borrowDate,
+            returnDate
+        };
+
+        const response = await fetch('/api/v1/borrow/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert('Borrow updated successfully!');
+            fetchBorrows();
+            document.getElementById('borrowForm').reset();
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            document.getElementById('updateBtn').style.display = 'none';
+            document.getElementById('borrowId').value = '';
+        } else {
+            alert('Update failed');
+        }
+    }
+
+    window.onload = function () {
+        fetchBorrows();
+        document.getElementById('updateBtn').style.display = 'none';
+        document.getElementById('borrowForm').addEventListener('submit', addBorrow);
+        document.getElementById('updateBtn').addEventListener('click', updateBorrow);
+    };
+</script>
+</body>
+</html>

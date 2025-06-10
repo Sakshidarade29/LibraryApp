@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Author</title>
+    <meta charset="UTF-8">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}" />
+    <style>
+        body {
+            background-color: #ffe4e1; /* Light pink */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 80px auto;
+        }
+
+        .form-container h2 {
+            margin-bottom: 25px;
+            color: #d63384; /* Bootstrap pink */
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            background-color: #d63384;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-custom:hover {
+            background-color: #c21869;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .back-link:hover {
+            color: #343a40;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h2>Edit Author</h2>
+            <form th:action="@{/authors/update}" method="post">
+                <input type="hidden" name="authorid" th:value="${author.authorid}" />
+                
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" th:value="${author.name}" class="form-control" required />
+                </div>
+
+                <button type="submit" class="btn btn-custom btn-block">Update Author</button>
+            </form>
+            <a href="/authors" class="back-link">← Back to Author List</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script th:src="@{/webjars/bootstrap/4.6.0/js/bootstrap.min.js}"></script>
+</body>
+</html>

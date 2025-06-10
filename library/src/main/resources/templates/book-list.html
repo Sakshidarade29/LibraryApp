@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Management</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}" />
+    <style>
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: #fff;
+            padding: 40px 50px;
+            margin-top: 40px;
+            border-radius: 12px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        form .form-control {
+            height: 45px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        form .form-control:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.5);
+        }
+        form button.btn-primary {
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        form button.btn-primary:hover {
+            background-color: #004085;
+        }
+        table {
+            margin-top: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        thead.thead-dark {
+            background-color: #343a40;
+            color: #fff;
+            font-weight: 600;
+        }
+        tbody tr:hover {
+            background-color: #e7f1ff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        td, th {
+            vertical-align: middle !important;
+            text-align: center;
+        }
+        .btn-warning, .btn-danger {
+            padding: 6px 14px;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: box-shadow 0.2s ease;
+        }
+        .btn-warning:hover {
+            background-color: #d39e00;
+            box-shadow: 0 4px 10px rgba(211,158,0,0.5);
+        }
+        .btn-danger:hover {
+            background-color: #bd2130;
+            box-shadow: 0 4px 10px rgba(189,33,48,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Book Management</h2>
+
+    <!-- Add Book Form -->
+    <form th:action="@{/books/save}" method="post" class="mb-4">
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <input type="text" name="title" placeholder="Book Title" class="form-control" required />
+            </div>
+            <div class="col-md-3 mb-3">
+                <select name="author_id" class="form-control" required>
+                    <option value="" disabled selected>Select Author</option>
+                    <option th:each="author : ${authors}" th:value="${author.authorid}" th:text="${author.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <select name="publisher_id" class="form-control" required>
+                    <option value="" disabled selected>Select Publisher</option>
+                    <option th:each="publisher : ${publishers}" th:value="${publisher.publisherid}" th:text="${publisher.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-2 mb-3 d-flex align-items-center">
+                <button type="submit" class="btn btn-primary btn-block">Add Book</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Book Table -->
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publisher</th>
+            <th style="width: 160px;">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <td th:text="${book.bookid}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.author.name}"></td>
+            <td th:text="${book.publisher.name}"></td>
+            <td>
+                <a th:href="@{'/books/edit/' + ${book.bookid}}" class="btn btn-warning btn-sm mr-2">Edit</a>
+                <a th:href="@{'/delete/' + ${book.bookid}}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Are you sure you want to delete this book?');">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script th:src="@{/webjars/bootstrap/4.6.0/js/bootstrap.min.js}"></script>
+</body>
+</html>
